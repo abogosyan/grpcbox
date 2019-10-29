@@ -20,7 +20,7 @@
                          stats_handler := module() | undefined
                         },
                conn :: pid() | undefined,
-               idle_interval :: timer:time()}).
+               idle_interval :: non_neg_integer()}).
 
 start_link(Name, Channel, Endpoint, Encoding, StatsHandler) ->
     gen_statem:start_link(?MODULE, [Name, Channel, Endpoint, Encoding, StatsHandler], []).

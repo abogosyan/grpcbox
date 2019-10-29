@@ -42,7 +42,7 @@
                                  stream_interceptor => grpcbox_client:stream_interceptor()}
                              | undefined,
                stats_handler :: module() | undefined,
-               refresh_interval :: timer:time()}).
+               refresh_interval :: non_neg_integer()}).
 
 -spec start_link(name(), [endpoint()], options()) -> {ok, pid()}.
 start_link(Name, Endpoints, Options) ->
