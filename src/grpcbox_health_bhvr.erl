@@ -8,8 +8,8 @@
 -module(grpcbox_health_bhvr).
 
 %% @doc Unary RPC
--callback check(ctx:ctx(), grpcbox_health_pb:health_check_request()) ->
-    {ok, grpcbox_health_pb:health_check_response(), ctx:ctx()} | grpcbox_stream:grpc_error_response().
+-callback check(ctx:t(), grpcbox_health_pb:health_check_request()) ->
+    {ok, grpcbox_health_pb:health_check_response(), ctx:t()} | grpcbox_stream:grpc_error_response().
 
 %% @doc 
 -callback watch(grpcbox_health_pb:health_check_request(), grpcbox_stream:t()) ->

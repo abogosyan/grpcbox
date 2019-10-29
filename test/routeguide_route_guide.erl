@@ -27,7 +27,7 @@
     #{name => string(),
       location => point()}.
 
--spec get_feature(Ctx :: ctx:ctx(), Message :: point()) -> {ok, feature(), ctx:ctx()}.
+-spec get_feature(Ctx :: ctx:t(), Message :: point()) -> {ok, feature(), ctx:t()}.
 get_feature(Ctx, Message) ->
     Feature = #{name => find_point(Message, data()),
                 location => Message},
