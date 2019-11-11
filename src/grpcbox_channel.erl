@@ -84,7 +84,7 @@ init([Name, Endpoints, Options]) ->
     case maps:get(trap_exit, Options, true) of
         false -> ok;
         true ->
-            process_flag(trap_exit, true);
+            process_flag(trap_exit, true)
     end,
 
     BalancerType = maps:get(balancer, Options, round_robin),
