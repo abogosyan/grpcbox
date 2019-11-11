@@ -26,7 +26,8 @@
                      encoding => gprcbox:encoding(),
                      unary_interceptor => grpcbox_client:unary_interceptor(),
                      stream_interceptor => grpcbox_client:stream_interceptor(),
-                     sync_start => boolean()}.
+                     sync_start => boolean(),
+                     trap_exit => boolean()}.
 -type load_balancer() :: round_robin | random | hash | direct | claim.
 -export_type([t/0,
               name/0,
@@ -80,7 +81,11 @@ stop(Name) ->
     gen_statem:stop(?CHANNEL(Name)).
 
 init([Name, Endpoints, Options]) ->
-    process_flag(trap_exit, true),
+    case maps:get(trap_exit, Options, true) of
+        false -> ok;
+        true ->
+            process_flag(trap_exit, true);
+    end,
 
     BalancerType = maps:get(balancer, Options, round_robin),
     Encoding = maps:get(encoding, Options, identity),
