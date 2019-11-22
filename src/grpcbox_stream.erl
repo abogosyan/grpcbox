@@ -62,7 +62,7 @@
 -type grpc_status_message() :: unicode:chardata().
 -type grpc_status() :: 0..16.
 -type grpc_error() :: {grpc_status(), grpc_status_message()}.
--type grpc_error_response() :: {grpc_error, grpc_error()}.
+-type grpc_error_response() :: {grpc_error, grpc_error()} | {error, any()}.
 
 init(ConnPid, StreamId, [Socket, ServicesTable, AuthFun, UnaryInterceptor,
                          StreamInterceptor, StatsHandler]) ->
@@ -168,14 +168,14 @@ handle_streams(Ref, State=#state{full_method=FullMethod,
         {ok, Response, State2} ->
             send(Response, State2);
         E={grpc_error, _} ->
-            throw(E)
+            exit({shutdown, E})
     end;
 handle_streams(Ref, State=#state{full_method=FullMethod,
                                  stream_interceptor=StreamInterceptor,
                                  method=#method{module=Module,
                                                 function=Function,
                                                 output={_, true}}}) ->
-    case StreamInterceptor of
+    case (case StreamInterceptor of
         undefined ->
             Module:Function(Ref, State);
         _ ->
@@ -184,6 +184,10 @@ handle_streams(Ref, State=#state{full_method=FullMethod,
                            input_stream => true,
                            output_stream => true},
             StreamInterceptor(Ref, State, ServerInfo, fun Module:Function/2)
+    end) of
+        ok -> ok;
+        E={grpc_error, _} ->
+            exit({shutdown, E})
     end.
 
 on_send_push_promise(_, State) ->
@@ -207,6 +211,8 @@ on_receive_data(Bin, State=#state{request_encoding=Encoding,
                              end, State, Messages),
         {ok, State1#state{buffer=NewBuffer}}
     catch
+        exit:{{shutdown, {grpc_error, {Status, Message}}}, _} ->
+            end_stream(Status, Message, State);
         throw:{grpc_error, {Status, Message}} ->
             end_stream(Status, Message, State);
         C:E:S ->
@@ -261,7 +267,7 @@ handle_unary(Ctx, Message, State=#state{unary_interceptor=UnaryInterceptor,
             State1 = from_ctx(Ctx2),
             send(false, Response, State1);
         E={grpc_error, _} ->
-            throw(E)
+            exit({shutdown, E})
     end.
 
 on_end_stream(State) ->
@@ -380,6 +386,9 @@ handle_info({'EXIT', _, normal}, State) ->
     end_stream(State),
     State;
 handle_info({'EXIT', _, {grpc_error, {Status, Message}}}, State) ->
+    end_stream(Status, Message, State),
+    State;
+handle_info({'EXIT', _, {shutdown, {grpc_error, {Status, Message}}}}, State) ->
     end_stream(Status, Message, State),
     State;
 handle_info({'EXIT', _, _Other}, State) ->

@@ -86,7 +86,7 @@ unary_handler(Ctx, Channel, Path, Input, Def, Options) ->
                         {ok, Data, #{headers => Headers,
                                      trailers => Metadata}};
                     {ok, {Status, Message, _Metadata}} ->
-                        {error, {Status, Message}}
+                        {grpc_error, {Status, Message}}
                 end;
             {error, _}=Error ->
                 Error
