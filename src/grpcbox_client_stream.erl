@@ -109,7 +109,7 @@ recv_msg(S=#{stream_id := Id,
                 {ok, {<<"0">> = _Status, _Message, _Metadata}} ->
                     stream_finished;
                 {ok, {Status, Message, _Metadata}} ->
-                    {error, {Status, Message}};
+                    {grpc_error, {Status, Message}};
                 timeout ->
                     stream_finished
             end

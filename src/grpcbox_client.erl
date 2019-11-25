@@ -188,7 +188,7 @@ recv(Type, #{stream_id := Id,
                 {trailers, Id, {<<"0">>, _Message, Metadata}} ->
                     {ok, #{trailers => Metadata}};
                 {trailers, Id, {Status, Message, _Metadata}} ->
-                    {error, {Status, Message}}
+                    {grpc_error, {Status, Message}}
             after 0 ->
                     {error, unknown}
             end
