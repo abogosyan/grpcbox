@@ -213,6 +213,8 @@ on_receive_data(Bin, State=#state{request_encoding=Encoding,
     catch
         exit:{{shutdown, {grpc_error, {Status, Message}}}, _} ->
             end_stream(Status, Message, State);
+        exit:{shutdown, {grpc_error, {Status, Message}}} ->
+            end_stream(Status, Message, State);
         throw:{grpc_error, {Status, Message}} ->
             end_stream(Status, Message, State);
         C:E:S ->
