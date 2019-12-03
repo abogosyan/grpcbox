@@ -60,7 +60,7 @@
 -type t() :: #state{}.
 
 -type grpc_status_message() :: unicode:chardata().
--type grpc_status() :: 0..16.
+-type grpc_status() :: binary().
 -type grpc_error() :: {grpc_status(), grpc_status_message()}.
 -type grpc_error_response() :: {grpc_error, grpc_error()} | {error, any()}.
 
