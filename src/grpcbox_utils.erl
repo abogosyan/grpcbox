@@ -59,7 +59,7 @@ is_reserved_header(<<"grpc-status-details-bin">>) -> true;
 is_reserved_header(<<"te">>) -> true;
 is_reserved_header(_) -> false.
 
--spec status_to_string(binary()) -> binary().
+-spec status_to_string(binary() | undefined) -> binary().
 status_to_string(?GRPC_STATUS_OK) ->
     <<"OK">>;
 status_to_string(?GRPC_STATUS_CANCELLED) ->
@@ -94,5 +94,7 @@ status_to_string(?GRPC_STATUS_DATA_LOSS) ->
     <<"DATA_LOSS">>;
 status_to_string(?GRPC_STATUS_UNAUTHENTICATED) ->
     <<"UNAUTHENTICATED">>;
-status_to_string(Code) ->
-    <<"CODE_", Code/binary>>.
+status_to_string(Code) when is_binary(Code) ->
+    <<"CODE_", Code/binary>>;
+status_to_string(undefined) ->
+    <<"UNDEFINED">>.
